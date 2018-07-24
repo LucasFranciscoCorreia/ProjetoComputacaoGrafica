@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import br.ufrpe.computacaografica.beans.Matriz;
-import br.ufrpe.computacaografica.beans.Pixel;
 import br.ufrpe.computacaografica.beans.Ponto;
 import br.ufrpe.computacaografica.beans.Triangulo;
 import br.ufrpe.computacaografica.beans.Vetor;
@@ -83,7 +82,7 @@ public class JanelaParteDois implements Initializable{
 
 	Ponto p[];
 	Triangulo t[];
-	Pixel tela[][];
+	double profundidade[][];
 
 	private Vetor U, V, N;
 	private double d, hx, hy;
@@ -165,6 +164,7 @@ public class JanelaParteDois implements Initializable{
 		atualizarCoordVista();
 		normalTriangulo();
 		normalVertice();
+		ordentarTriangulo();
 		pintarTela();
 		salvarPontosArquivo();
 		BufferedReader reader = new BufferedReader(new FileReader("camera.txt"));
@@ -185,6 +185,18 @@ public class JanelaParteDois implements Initializable{
 		this.Ks.setText(reader.readLine());
 		this.eta.setText(reader.readLine());
 		reader.close();
+	}
+
+	private void ordentarTriangulo() {
+		for(int i = 1; i < t.length;i++) {
+			int j = i-1;
+			Triangulo aux = t[i];
+			while(j >= 0 && (t[i].getBaricentro().getP(2) > t[j].getBaricentro().getP(2))) {
+				t[j+1] = t[j];
+				j--;
+			}
+			t[j+1] = aux;
+		}
 	}
 
 	private void ortogonizarV() {
@@ -244,13 +256,13 @@ public class JanelaParteDois implements Initializable{
 
 	private void pintarTela() {
 		GraphicsContext gc = this.desenho.getGraphicsContext2D();
-		gc.setFill(Color.BLACK); // Cor do fundo
-		gc.fillRect(0, 0, 500, 500); // Pinta o fundo
+		gc.setFill(Color.BLACK); 
+		gc.fillRect(0, 0, 500, 500);
 
 		for (int i = 0; i < t.length; i++) {
-			double pontoA[] = projetaPontoNaTela(t[i].getP(0));
-			double pontoB[] = projetaPontoNaTela(t[i].getP(1));
-			double pontoC[] = projetaPontoNaTela(t[i].getP(2));
+			double pontoA[] = calcularCoordenadaTela(t[i].getP(0));
+			double pontoB[] = calcularCoordenadaTela(t[i].getP(1));
+			double pontoC[] = calcularCoordenadaTela(t[i].getP(2));
 
 			t[i].setTela(0, new Ponto(pontoA));
 			t[i].setTela(1, new Ponto(pontoB));
@@ -261,10 +273,8 @@ public class JanelaParteDois implements Initializable{
 	}
 
 	private void scanLine(GraphicsContext gc, Triangulo t) {
-		double ymin = Math.min(t.getTela(0).getP(1), t.getTela(1).getP(1));
-		ymin = Math.min(ymin, t.getTela(2).getP(1));
 		Ponto inicio = null, meio = null, fim = null;
-		if (ymin == t.getTela(0).getP(1)) {
+		if (t.getTela(0).getP(1) <= t.getTela(1).getP(1) && t.getTela(0).getP(1) <= t.getTela(2).getP(1)) {
 			inicio = t.getTela(0);
 			if (t.getTela(1).getP(1) <= t.getTela(2).getP(1)) {
 				meio = t.getTela(1);
@@ -273,7 +283,7 @@ public class JanelaParteDois implements Initializable{
 				meio = t.getTela(2);
 				fim = t.getTela(1);
 			}
-		} else if (ymin == t.getTela(1).getP(1)) {
+		} else if (t.getTela(1).getP(1) <= t.getTela(2).getP(1)) {
 			inicio = t.getTela(1);
 			if (t.getTela(0).getP(1) <= t.getTela(2).getP(1)) {
 				meio = t.getTela(0);
@@ -282,7 +292,7 @@ public class JanelaParteDois implements Initializable{
 				meio = t.getTela(2);
 				fim = t.getTela(0);
 			}
-		} else if (ymin == t.getTela(2).getP(1)) {
+		} else {
 			inicio = t.getTela(2);
 			if (t.getTela(1).getP(1) <= t.getTela(0).getP(1)) {
 				meio = t.getTela(1);
@@ -291,15 +301,7 @@ public class JanelaParteDois implements Initializable{
 				meio = t.getTela(0);
 				fim = t.getTela(1);
 			}
-		} else {
-			System.err.println("ymin não corresponde a nada");
 		}
-
-		//		analisarOrdem(inicio, meio, fim);
-
-		//        if (Double.valueOf(meio.y).equals(fim.y)) System.out.println("Superior");
-		//        else if (Double.valueOf(inicio.y).equals(meio.y)) System.out.println("Inferior");
-		//        else System.out.println("Normal");
 
 		pintarTopDown(gc, inicio, meio, fim, t);
 		pintarDownTop(gc, inicio, meio, fim, t);
@@ -315,31 +317,31 @@ public class JanelaParteDois implements Initializable{
 			beta = (meio.getP(0) - fim.getP(0)) / (meio.getP(1) - fim.getP(1));
 		}
 
-		double xmax = fim.getP(0);
-		double xmin = fim.getP(0);
+		double maiorX = fim.getP(0);
+		double menorX = fim.getP(0);
 		for (int y = (int) fim.getP(1); y >= (int) meio.getP(1); y--) {
-			int ini = (int) Math.round(xmin);
-			int end = (int) Math.round(xmax);
+			int ini = (int) Math.round(menorX);
+			int end = (int) Math.round(maiorX);
 			for (int x = ini; x <= end; x++) {
 				calcularCor(x, y, t);
 			}
-			xmin -= alpha;
-			xmax -= beta;
+			menorX -= alpha;
+			maiorX -= beta;
 		}	
 		double aux = beta;
 		beta = alpha;
 		alpha = aux;
 
-		xmax = fim.getP(0);
-		xmin = fim.getP(0);
+		maiorX = fim.getP(0);
+		menorX = fim.getP(0);
 		for (int y = (int) fim.getP(1); y >= (int) meio.getP(1); y--) {
-			int ini = (int) Math.round(xmin);
-			int end = (int) Math.round(xmax);
+			int ini = (int) Math.round(menorX);
+			int end = (int) Math.round(maiorX);
 			for (int x = ini; x <= end; x++) {
 				calcularCor(x, y, t);
 			}
-			xmin -= alpha;
-			xmax -= beta;
+			menorX -= alpha;
+			maiorX -= beta;
 		}
 	}
 
@@ -353,23 +355,23 @@ public class JanelaParteDois implements Initializable{
 			beta = (meio.getP(0) - inicio.getP(0)) / (meio.getP(1) - inicio.getP(1));
 		}
 
-		double xmax = inicio.getP(0);
-		double xmin = inicio.getP(0);
+		double maiorX = inicio.getP(0);
+		double menorX = inicio.getP(0);
 
 
 		for (int y = (int) Math.round(inicio.getP(1)); y <= (int) Math.round(meio.getP(1)); y++) {
 			double aux = Math.max(inicio.getP(0), meio.getP(0));
 			aux = Math.max(aux, fim.getP(0));
-			int ini = (int) Math.round(xmin);
-			int end = (int) Math.round(xmax);
+			int ini = (int) Math.round(menorX);
+			int end = (int) Math.round(maiorX);
 			for (int x = ini; x <= end; x++) {
 				calcularCor(x, y, t);
 			}
-			xmin += alpha;
-			xmax += beta;
+			menorX += alpha;
+			maiorX += beta;
 		}
-		xmax = inicio.getP(0);
-		xmin = inicio.getP(0);
+		maiorX = inicio.getP(0);
+		menorX = inicio.getP(0);
 
 		double aux2 = beta;
 		beta = alpha;
@@ -378,13 +380,13 @@ public class JanelaParteDois implements Initializable{
 		for (int y = (int) Math.round(inicio.getP(1)); y <= (int) Math.round(meio.getP(1)); y++) {
 			double aux = Math.max(inicio.getP(0), meio.getP(0));
 			aux = Math.max(aux, fim.getP(0));
-			int ini = (int) Math.round(xmin);
-			int end = (int) Math.round(xmax);
+			int ini = (int) Math.round(menorX);
+			int end = (int) Math.round(maiorX);
 			for (int x = ini; x <= end; x++) {
 				calcularCor(x, y, t);
 			}
-			xmin += alpha;
-			xmax += beta;
+			menorX += alpha;
+			maiorX += beta;
 		}
 	}
 
@@ -435,8 +437,8 @@ public class JanelaParteDois implements Initializable{
 	}
 
 	private void organizarZ(int i, int j, double profundidadeAtual, Color cor) {
-		if (i < 500 && i >= 0 && j < 500 && j >= 0 && tela[i][j].profundidade < profundidadeAtual) {
-			tela[i][j].profundidade = profundidadeAtual;
+		if (i < 500 && i >= 0 && j < 500 && j >= 0 && profundidade[i][j] < profundidadeAtual) {
+			profundidade[i][j] = profundidadeAtual;
 			this.desenho.getGraphicsContext2D().setFill(cor);
 			this.desenho.getGraphicsContext2D().fillRect(i, j, 1, 1);
 		}
@@ -467,7 +469,7 @@ public class JanelaParteDois implements Initializable{
 		return retorno;
 	}
 
-	private double[] projetaPontoNaTela(Ponto a) {
+	private double[] calcularCoordenadaTela(Ponto a) {
 		double pontoA[] = new double[2];
 		pontoA[0] = (this.d * a.getP(0)) / (a.getP(2) * this.hx);
 		pontoA[1] = (this.d * a.getP(1)) / (a.getP(2) * this.hy);
@@ -558,12 +560,10 @@ public class JanelaParteDois implements Initializable{
 	}
 
 	private void iniciarTela() {
-		tela = new Pixel[500][500];
+		profundidade = new double[500][500];
 		for(int i = 0; i < 500;i++) {
 			for(int j = 0; j < 500;j++) {
-				tela[i][j] = new Pixel();
-				tela[i][j].cor = Color.BLACK;
-				tela[i][j].profundidade = Double.NEGATIVE_INFINITY;
+				profundidade[i][j] = Double.NEGATIVE_INFINITY;
 			}
 		}
 	}
@@ -617,7 +617,6 @@ public class JanelaParteDois implements Initializable{
 			reader.close();
 			mudarPerspectiva(null);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

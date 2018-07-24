@@ -17,6 +17,13 @@ public class Triangulo {
 		//ordenarPontos();
 	}
 	
+	public Ponto getBaricentro() {
+		double res[] = {(this.getP(0).getP(0) + this.getP(0).getP(1) + this.getP(0).getP(2))/3,
+				(this.getP(1).getP(0) + this.getP(1).getP(1) + this.getP(1).getP(2))/3,
+				(this.getP(2).getP(0) + this.getP(2).getP(1) + this.getP(2).getP(2))/3};
+		return new Ponto(res);
+	}
+	
 	public Ponto getTela(int i) {
 		return tela[i];
 	}
