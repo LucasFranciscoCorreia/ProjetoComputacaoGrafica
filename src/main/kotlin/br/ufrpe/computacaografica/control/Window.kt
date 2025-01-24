@@ -11,10 +11,13 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
-import javafx.scene.image.PixelWriter
 import javafx.scene.image.WritableImage
 import javafx.scene.layout.AnchorPane
 import javafx.scene.paint.Color
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.*
 import java.net.URL
 import java.util.*
@@ -78,8 +81,6 @@ class Window : Initializable {
     @FXML
     private lateinit var desenho: Canvas
 
-    private lateinit var pixelWriter: PixelWriter
-
     @FXML
     private lateinit var sliderCameraX: MFXSlider
 
@@ -88,6 +89,54 @@ class Window : Initializable {
 
     @FXML
     private lateinit var sliderCameraZ: MFXSlider
+
+    @FXML
+    private lateinit var sliderD: MFXSlider
+
+    @FXML
+    private lateinit var sliderHX: MFXSlider
+
+    @FXML
+    private lateinit var sliderHY: MFXSlider
+
+    @FXML
+    private lateinit var sliderNX: MFXSlider
+
+    @FXML
+    private lateinit var sliderNY: MFXSlider
+
+    @FXML
+    private lateinit var sliderNZ: MFXSlider
+
+    @FXML
+    private lateinit var sliderVX: MFXSlider
+
+    @FXML
+    private lateinit var sliderVY: MFXSlider
+
+    @FXML
+    private lateinit var sliderVZ: MFXSlider
+
+    @FXML
+    private lateinit var sliderIambR: MFXSlider
+
+    @FXML
+    private lateinit var sliderIambG: MFXSlider
+
+    @FXML
+    private lateinit var sliderIlB: MFXSlider
+
+    @FXML
+    private lateinit var sliderIlR: MFXSlider
+
+    @FXML
+    private lateinit var sliderIlG: MFXSlider
+
+    @FXML
+    private lateinit var sliderIambB: MFXSlider
+    @FXML
+    private lateinit var sliderKa: MFXSlider
+
 
     private lateinit var p: Array<Point>
     private lateinit var t: Array<Triangle>
@@ -111,104 +160,72 @@ class Window : Initializable {
     private lateinit var gc: GraphicsContext
     private lateinit var writableImage: WritableImage
 
+    private var job: Job? = null
+
     private val height = 800
     private val width = 800
 
-    private fun readData(){
-        var linha = cValue.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        val a = linha[0].toDouble()
-        val b = linha[1].toDouble()
-        val c = linha[2].toDouble()
+    private  fun readCameraEIluminacao() {
+        var reader = BufferedReader(FileReader("camera.txt"))
 
+        var linha = reader.readLine()
+        var qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+
+        var a = qnt[0].toDouble()
+        var b = qnt[1].toDouble()
+        var c = qnt[2].toDouble()
+
+        sliderNX.value = a
+        sliderNY.value = b
+        sliderNZ.value = c
+
+        linha = reader.readLine()
+        qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        a = qnt[0].toDouble()
+        b = qnt[1].toDouble()
+        c = qnt[2].toDouble()
+        this.sliderVX.value = a
+        this.sliderVY.value = b
+        this.sliderVZ.value = c
+
+        sliderD.value =reader.readLine().toDouble()
+
+        sliderHX.value = reader.readLine().toDouble()
+
+        sliderHY.value = reader.readLine().toDouble()
+
+
+        linha = reader.readLine()
+        qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        a = qnt[0].toDouble()
+        b = qnt[1].toDouble()
+        c = qnt[2].toDouble()
         this.sliderCameraX.value = a
         this.sliderCameraY.value = b
         this.sliderCameraZ.value = c
 
-        this.C = Point(arrayOf( sliderCameraX.value,sliderCameraY.value, sliderCameraZ.value))
-
-
-        linha = nValue.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        this.N = Vector(arrayOf( linha[0].toDouble(),linha[1].toDouble(), linha[2].toDouble()))
-
-        linha = vValue.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        this.V = Vector(arrayOf( linha[0].toDouble(),linha[1].toDouble(), linha[2].toDouble()))
-
-        linha = dValue.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        this.d = linha[0].toDouble()
-
-        linha = hxValue.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        this.hx = linha[0].toDouble()
-
-        linha = hyValue.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        this.hy = linha[0].toDouble()
-
-        this.etaValue = eta.text.toInt().toDouble()
-        this.KaValue = Ka.text.toDouble()
-        this.KsValue = Ks.text.toDouble()
-
-        linha = Iamb.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        this.IambValue = Vector(arrayOf( linha[0].toDouble(),linha[1].toDouble(), linha[2].toDouble()))
-
-        linha = Kd.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        this.KdValue = Vector(arrayOf( linha[0].toDouble(),linha[1].toDouble(), linha[2].toDouble()))
-
-        linha = Od.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        this.OdValue = Vector(arrayOf( linha[0].toDouble(),linha[1].toDouble(), linha[2].toDouble()))
-
-        linha = Pl.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        this.PlValue = Vector(arrayOf( linha[0].toDouble(),linha[1].toDouble(), linha[2].toDouble()))
-
-        linha = iL.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        this.IlValue = Vector(arrayOf( linha[0].toDouble(),linha[1].toDouble(), linha[2].toDouble()))
-    }
-
-    private fun iniciarTela() {
-        this.tela = Array(width) { Array(height) { Pixel(Color.BLACK) }}
-        this.gc.fillRect(0.0, 0.0, width.toDouble(), height.toDouble())
-    }
-
-    override  fun initialize(arg0: URL?, arg1: ResourceBundle?) {
-        try {
-            writableImage = WritableImage(width, height)
-            pixelWriter = writableImage.pixelWriter
-            this.readCameraEIluminacao()
-            this.readData()
-            this.gc = desenho.graphicsContext2D
-            this.mudarPerspectiva(null)
-        } catch (var4: IOException) {
-            var4.printStackTrace()
-        }
-    }
-
-    @FXML
-    @Throws(IOException::class)
-     fun mudarPerspectiva(event: ActionEvent?) {
-        this.ortogonizarV()
-        this.getPontosArquivo()
-        this.iniciarTela()
-        this.setReferenciasOriginaisDosTriangulos()
-        this.atualizarCoordVista()
-        this.normalTriangulo()
-        this.normalVertice()
-        this.pintarTela()
-        //this.salvarPontosArquivo()
-        //readCameraEIluminacao()
-        println("finished")
-    }
-
-    private  fun readCameraEIluminacao() {
-        var reader = BufferedReader(FileReader("camera.txt"))
-        nValue.text = reader.readLine()
-        vValue.text = reader.readLine()
-        dValue.text = reader.readLine()
-        hxValue.text = reader.readLine()
-        hyValue.text = reader.readLine()
-        cValue.text = reader.readLine()
         reader.close()
         reader = BufferedReader(FileReader("iluminacao.txt"))
-        Iamb.text = reader.readLine()
-        Ka.text = reader.readLine()
-        iL.text = reader.readLine()
+        linha = reader.readLine()
+        qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        a = qnt[0].toDouble()
+        b = qnt[1].toDouble()
+        c = qnt[2].toDouble()
+        this.sliderIambR.value = a
+        this.sliderIambG.value = b
+        this.sliderIambB.value = c
+
+        sliderKa.value = reader.readLine().toDouble()
+
+        linha = reader.readLine()
+        qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        a = qnt[0].toDouble()
+        b = qnt[1].toDouble()
+        c = qnt[2].toDouble()
+        this.sliderIlR.value = a
+        this.sliderIlG.value = b
+        this.sliderIlB.value = c
+
         Pl.text = reader.readLine()
         Kd.text = reader.readLine()
         Od.text = reader.readLine()
@@ -217,6 +234,142 @@ class Window : Initializable {
         reader.close()
     }
 
+
+    private fun readData() {
+        this.N = Vector(arrayOf(sliderNX.value, sliderNY.value, sliderNZ.value))
+        this.C = Point(arrayOf(sliderCameraX.value, sliderCameraY.value, sliderCameraZ.value))
+
+        this.d = sliderD.value
+
+        this.hx = sliderHX.value
+        this.hy = sliderHY.value
+
+
+
+        this.V = Vector(arrayOf(sliderVX.value, sliderVY.value, sliderVZ.value))
+
+
+
+        this.etaValue = eta.text.toInt().toDouble()
+        this.KaValue = sliderKa.value
+        this.KsValue = Ks.text.toDouble()
+
+        //var linha = Iamb.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        this.IambValue = Vector(arrayOf(sliderIambR.value, sliderIambG.value, sliderIambB.value))
+
+
+        var linha = Kd.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        this.KdValue = Vector(arrayOf( linha[0].toDouble(),linha[1].toDouble(), linha[2].toDouble()))
+
+        linha = Od.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        this.OdValue = Vector(arrayOf( linha[0].toDouble(),linha[1].toDouble(), linha[2].toDouble()))
+
+        linha = Pl.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        this.PlValue = Vector(arrayOf( linha[0].toDouble(),linha[1].toDouble(), linha[2].toDouble()))
+
+        this.IlValue = Vector(arrayOf(sliderIlR.value, sliderIlG.value, sliderIlB.value))
+    }
+
+    private fun iniciarTela() {
+        this.tela = Array(height) { Array(width) { Pixel(Color.BLACK) }}
+        this.gc.fill = Color.BLACK
+        this.gc.fillRect(0.0, 0.0, width.toDouble(), height.toDouble())
+    }
+
+    override  fun initialize(arg0: URL?, arg1: ResourceBundle?) {
+        fun updateFrame(){
+            if(job?.isActive == true) job!!.cancel(CancellationException())
+            runBlocking {
+                job = launch {
+                    this@Window.mudarPerspectiva(null)
+
+                }
+            }
+            println("C.x ${sliderCameraX.value}")
+        }
+        try {
+            writableImage = WritableImage(width, height)
+            this.readCameraEIluminacao()
+            this.gc = desenho.graphicsContext2D
+            this.iniciarTela()
+            this.getPontosArquivo()
+            this.mudarPerspectiva(null)
+            this.sliderCameraX.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderCameraY.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderCameraZ.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderD.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderHX.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderHY.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderNX.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderNY.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderNZ.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderVX.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderVY.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderVZ.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderIambR.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderIambG.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderIambB.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderKa.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderIlR.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderIlG.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderIlB.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+        } catch (var4: IOException) {
+            var4.printStackTrace()
+        }
+    }
+
+    @FXML
+    @Throws(IOException::class)
+     fun mudarPerspectiva(event: ActionEvent?) {
+        this.readData()
+        this.ortogonizarV()
+        this.getPontosArquivo()
+        this.setReferenciasOriginaisDosTriangulos()
+        this.atualizarCoordVista()
+        this.normalTriangulo()
+        this.normalVertice()
+        this.pintarTela()
+        //this.salvarPontosArquivo()
+        //readCameraEIluminacao()
+    }
     private  fun ortogonizarV() {
         val orto = V.multEscalar(N) / N.multEscalar(N)
         val n = N.v
@@ -267,9 +420,11 @@ class Window : Initializable {
         writer.close()
     }
 
+    var el: Int = 0
     private  fun pintarTela() {
-        iniciarTela()
         var cont = 0
+        writableImage = WritableImage(width, height)
+        val pixelWriter = writableImage.pixelWriter
         t.forEach { triangle ->
             val pontoA = this.projetaPontoNaTela(triangle.p[0])
             val pontoB = this.projetaPontoNaTela(triangle.p[1])
@@ -278,18 +433,26 @@ class Window : Initializable {
             cont++
             println(cont)
         }
-        val filter: List<Triangle> = t.filter { triangle ->
-            triangle.tela.all{ point: Point ->
-                point.p[0].toInt() in 0 until height && point.p[1].toInt() in 0 until width
-            }
-        }
         cont = 0
-        filter.forEach { triangle ->
+        println("iniciando tela")
+        iniciarTela()
+        println("tela finaliazada")
+        println("iniciando rasterização")
+        t.forEach { triangle ->
             scanLine(triangle)
             cont++
             println(cont)
         }
-        cont = 0
+        println("finalizando rasterizaçao")
+        for (i in tela.indices){
+            for (j in tela[i].indices){
+                    pixelWriter.setColor(i, j, tela[i][j].color)
+            }
+        }
+
+        gc.drawImage(writableImage, 0.0, 0.0)
+        println("Canvas atualizado com writable image")
+        el = el+50
     }
 
     private  fun scanLine(t: Triangle) {
@@ -326,7 +489,6 @@ class Window : Initializable {
                 fim = t.tela[1]
             }
         }
-
         this.pintarTopDown(inicio, meio, fim, t)
         this.pintarDownTop(inicio, meio, fim, t)
     }
@@ -349,16 +511,17 @@ class Window : Initializable {
             var xmax: Double = fim.p[0]
             var xmin: Double = fim.p[0]
 
-            val min = max(Math.round(fim.p[1]).toInt(), 0)
-            val max = min(Math.round(meio.p[1]).toInt(), height)
+            val min = fim.p[1].toInt()
+            val max = meio.p[1].toInt()
             for (y in min downTo max) {
-                val ini = max(Math.round(xmin).toInt(), 0)
-                val end = min(Math.round(xmax).toInt(), width)
-
-                for (x in ini..end) {
-                    this.calcularCor(x.toDouble(), y.toDouble(), t)
-                }
-
+                val ini = Math.round(xmin).toInt()
+                val end = Math.round(xmax).toInt()
+                runBlocking { repeat(end-ini+1){ i->
+                    launch {
+                        val x = ini+i
+                        calcularCor(x.toDouble(), y.toDouble(), t)
+                    }
+                } }
                 xmin -= alpha
                 xmax -= beta
             }
@@ -373,12 +536,18 @@ class Window : Initializable {
             var xmax: Double = inicio.p[0]
             var xmin: Double = inicio.p[0]
 
-             val min = max(Math.round(inicio.p[1]).toInt(), 0)
-             val max = min(Math.round(meio.p[1]).toInt(), height)
+             val min = inicio.p[1].toInt()
+             val max = meio.p[1].toInt()
 
             for (y in min..max) {
-                val ini = max(Math.round(xmin).toInt(), 0)
-                val end = min(Math.round(xmax).toInt(), width)
+                val ini = xmin.toInt()
+                val end = xmax.toInt()
+                runBlocking { repeat(end-ini+1){ i->
+                    launch {
+                        val x = ini+i
+                        calcularCor(x.toDouble(), y.toDouble(), t)
+                    }
+                } }
                 for(x in ini..end){
                     this.calcularCor(x.toDouble(), y.toDouble(), t)
                 }
@@ -445,7 +614,8 @@ class Window : Initializable {
 
         if (i in 0 until width && j in 0 until height && tela[i][j].profundidade < profundidadeAtual) {
             tela[i][j].profundidade = profundidadeAtual
-            pixelWriter.setColor(i, j, cor)
+            tela[i][j].color = cor
+            //pixelWriter.setColor(i, j, cor)
         }
     }
 
