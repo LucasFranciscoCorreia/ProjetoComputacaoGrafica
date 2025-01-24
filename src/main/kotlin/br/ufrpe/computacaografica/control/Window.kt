@@ -124,6 +124,9 @@ class Window : Initializable {
     private lateinit var sliderIambG: MFXSlider
 
     @FXML
+    private lateinit var sliderIambB: MFXSlider
+
+    @FXML
     private lateinit var sliderIlB: MFXSlider
 
     @FXML
@@ -133,9 +136,29 @@ class Window : Initializable {
     private lateinit var sliderIlG: MFXSlider
 
     @FXML
-    private lateinit var sliderIambB: MFXSlider
+    private lateinit var sliderPlX: MFXSlider
+
+    @FXML
+    private lateinit var sliderPlY: MFXSlider
+
+    @FXML
+    private lateinit var sliderPlZ: MFXSlider
+
     @FXML
     private lateinit var sliderKa: MFXSlider
+
+    @FXML
+    private lateinit var sliderKdR: MFXSlider
+
+    @FXML
+    private lateinit var sliderKdG: MFXSlider
+
+    @FXML
+    private lateinit var sliderKdB: MFXSlider
+
+    @FXML
+    private lateinit var sliderEta: MFXSlider
+
 
 
     private lateinit var p: Array<Point>
@@ -226,11 +249,27 @@ class Window : Initializable {
         this.sliderIlG.value = b
         this.sliderIlB.value = c
 
-        Pl.text = reader.readLine()
-        Kd.text = reader.readLine()
+        linha = reader.readLine()
+        qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        a = qnt[0].toDouble()
+        b = qnt[1].toDouble()
+        c = qnt[2].toDouble()
+        this.sliderPlX.value = a
+        this.sliderPlZ.value = b
+        this.sliderPlY.value = c
+
+        linha = reader.readLine()
+        qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        a = qnt[0].toDouble()
+        b = qnt[1].toDouble()
+        c = qnt[2].toDouble()
+        this.sliderKdR.value = a
+        this.sliderKdG.value = b
+        this.sliderKdB.value = c
+
         Od.text = reader.readLine()
         Ks.text = reader.readLine()
-        eta.text = reader.readLine()
+        sliderEta.value = reader.readLine().toDouble()
         reader.close()
     }
 
@@ -244,28 +283,21 @@ class Window : Initializable {
         this.hx = sliderHX.value
         this.hy = sliderHY.value
 
-
-
         this.V = Vector(arrayOf(sliderVX.value, sliderVY.value, sliderVZ.value))
 
-
-
-        this.etaValue = eta.text.toInt().toDouble()
+        this.etaValue = sliderEta.value
         this.KaValue = sliderKa.value
         this.KsValue = Ks.text.toDouble()
 
-        //var linha = Iamb.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         this.IambValue = Vector(arrayOf(sliderIambR.value, sliderIambG.value, sliderIambB.value))
 
 
-        var linha = Kd.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        this.KdValue = Vector(arrayOf( linha[0].toDouble(),linha[1].toDouble(), linha[2].toDouble()))
+        this.KdValue = Vector(arrayOf(sliderKdR.value, sliderKdG.value, sliderKdB.value))
 
-        linha = Od.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        var linha = Od.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         this.OdValue = Vector(arrayOf( linha[0].toDouble(),linha[1].toDouble(), linha[2].toDouble()))
 
-        linha = Pl.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        this.PlValue = Vector(arrayOf( linha[0].toDouble(),linha[1].toDouble(), linha[2].toDouble()))
+        this.PlValue = Vector(arrayOf(sliderPlX.value, sliderPlZ.value, sliderPlY.value))
 
         this.IlValue = Vector(arrayOf(sliderIlR.value, sliderIlG.value, sliderIlB.value))
     }
@@ -349,6 +381,27 @@ class Window : Initializable {
                 updateFrame()
             }
             this.sliderIlB.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderPlX.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderPlZ.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderPlY.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderKdR.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderKdG.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderKdB.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderEta.valueProperty().addListener { _, _, newValue ->
                 updateFrame()
             }
         } catch (var4: IOException) {
