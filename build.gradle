@@ -49,6 +49,16 @@ javafx {
   modules = ['javafx.controls', 'javafx.fxml']
 }
 
+tasks.jar {
+  manifest {
+    attributes 'Main-Class': application.mainClass
+  }
+  from {
+    configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib:2.1.0"
   implementation "org.openjfx:javafx-controls:23"
