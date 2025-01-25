@@ -4,15 +4,14 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.ufrpe.computacaografica.control.Window">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1250.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.ufrpe.computacaografica.control.Window">
    <left>
-      <AnchorPane prefHeight="500.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="500.0" prefWidth="225.0" BorderPane.alignment="CENTER">
          <VBox alignment="CENTER" layoutX="27.0" layoutY="22.0" prefHeight="500.0" prefWidth="200.0" spacing="8.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <VBox alignment="TOP_CENTER" spacing="8.0">
                <Label text="Camera" />
@@ -22,7 +21,7 @@
                         <Insets right="16.0" />
                      </HBox.margin>
                   </Label>
-                  <MFXSlider fx:id="sliderCameraX" enableKeyboard="false" max="1000.0" min="-1000.0" prefWidth="150.0" />
+                  <MFXSlider id="custom" fx:id="sliderCameraX" enableKeyboard="false" max="1000.0" min="-1000.0" prefWidth="150.0" />
                </HBox>
                <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
                   <Label text="Y">
@@ -42,278 +41,276 @@
                </HBox>
             </VBox>
             <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="168.0" spacing="8.0">
-               <children>
-                  <Label text="Distance" />
-                  <HBox alignment="CENTER_RIGHT">
-                     <children>
-                        <MFXSlider fx:id="sliderD" decimalPrecision="2" enableKeyboard="false" max="20.0" min="-20.0" prefWidth="150.0" />
-                     </children>
-                  </HBox>
-               </children>
+               <Label text="Distance"/>
+               <HBox alignment="CENTER_RIGHT">
+                  <MFXSlider fx:id="sliderD" decimalPrecision="2" enableKeyboard="false" max="20.0" min="-20.0"
+                             prefWidth="150.0"/>
+               </HBox>
             </VBox>
             <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="172.0" spacing="8.0">
-               <children>
-                  <Label text="Orthonormal Basis" />
-                  <HBox alignment="CENTER_RIGHT">
-                     <children>
-                        <Label text="HX">
-                           <HBox.margin>
-                              <Insets right="16.0" />
-                           </HBox.margin>
-                        </Label>
-                        <MFXSlider fx:id="sliderHX" decimalPrecision="2" enableKeyboard="false" max="20.0" min="-20.0" prefWidth="150.0" />
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
-                     <children>
-                        <Label text="HY">
-                           <HBox.margin>
-                              <Insets right="16.0" />
-                           </HBox.margin>
-                        </Label>
-                        <MFXSlider fx:id="sliderHY" decimalPrecision="2" enableKeyboard="false" max="20.0" min="-20.0" prefWidth="150.0" />
-                     </children>
-                  </HBox>
-               </children>
+               <Label text="Orthonormal Basis"/>
+               <HBox alignment="CENTER_RIGHT">
+                  <Label text="HX">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderHX" decimalPrecision="2" enableKeyboard="false" max="20.0" min="-20.0"
+                             prefWidth="150.0"/>
+               </HBox>
+               <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
+                  <Label text="HY">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderHY" decimalPrecision="2" enableKeyboard="false" max="20.0" min="-20.0"
+                             prefWidth="150.0"/>
+               </HBox>
             </VBox>
             <VBox alignment="TOP_CENTER" spacing="8.0">
-               <children>
-                  <Label text="N" />
-                  <HBox alignment="CENTER_RIGHT">
-                     <children>
-                        <Label text="X">
-                           <HBox.margin>
-                              <Insets right="16.0" />
-                           </HBox.margin>
-                        </Label>
-                        <MFXSlider fx:id="sliderNX" decimalPrecision="1" enableKeyboard="false" max="20.0" min="-20.0" prefWidth="150.0" />
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
-                     <children>
-                        <Label text="Y">
-                           <HBox.margin>
-                              <Insets right="16.0" />
-                           </HBox.margin>
-                        </Label>
-                        <MFXSlider fx:id="sliderNY" decimalPrecision="1" enableKeyboard="false" max="20.0" min="-20.0" prefWidth="150.0" />
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="44.0">
-                     <children>
-                        <Label text="Z">
-                           <HBox.margin>
-                              <Insets right="16.0" />
-                           </HBox.margin>
-                        </Label>
-                        <MFXSlider fx:id="sliderNZ" decimalPrecision="1" enableKeyboard="false" max="20.0" min="-20.0" prefWidth="150.0" />
-                     </children>
-                  </HBox>
-               </children>
+               <Label text="N"/>
+               <HBox alignment="CENTER_RIGHT">
+                  <Label text="X">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderNX" decimalPrecision="1" enableKeyboard="false" max="20.0" min="-20.0"
+                             prefWidth="150.0"/>
+               </HBox>
+               <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
+                  <Label text="Y">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderNY" decimalPrecision="1" enableKeyboard="false" max="20.0" min="-20.0"
+                             prefWidth="150.0"/>
+               </HBox>
+               <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="44.0">
+                  <Label text="Z">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderNZ" decimalPrecision="1" enableKeyboard="false" max="20.0" min="-20.0"
+                             prefWidth="150.0"/>
+               </HBox>
             </VBox>
             <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="262.0" spacing="8.0">
-               <children>
-                  <Label text="V" />
-                  <HBox alignment="CENTER_RIGHT">
-                     <children>
-                        <Label text="X">
-                           <HBox.margin>
-                              <Insets right="16.0" />
-                           </HBox.margin>
-                        </Label>
-                        <MFXSlider fx:id="sliderVX" decimalPrecision="1" enableKeyboard="false" max="20.0" min="-20.0" prefWidth="150.0" />
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
-                     <children>
-                        <Label text="Y">
-                           <HBox.margin>
-                              <Insets right="16.0" />
-                           </HBox.margin>
-                        </Label>
-                        <MFXSlider fx:id="sliderVY" decimalPrecision="1" enableKeyboard="false" max="20.0" min="-20.0" prefWidth="150.0" />
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="44.0">
-                     <children>
-                        <Label text="Z">
-                           <HBox.margin>
-                              <Insets right="16.0" />
-                           </HBox.margin>
-                        </Label>
-                        <MFXSlider fx:id="sliderVZ" decimalPrecision="1" enableKeyboard="false" max="20.0" min="-20.0" prefWidth="150.0" />
-                     </children>
-                  </HBox>
-               </children>
+               <Label text="V"/>
+               <HBox alignment="CENTER_RIGHT">
+                  <Label text="X">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderVX" decimalPrecision="1" enableKeyboard="false" max="20.0" min="-20.0"
+                             prefWidth="150.0"/>
+               </HBox>
+               <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
+                  <Label text="Y">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderVY" decimalPrecision="1" enableKeyboard="false" max="20.0" min="-20.0"
+                             prefWidth="150.0"/>
+               </HBox>
+               <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="44.0">
+                  <Label text="Z">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderVZ" decimalPrecision="1" enableKeyboard="false" max="20.0" min="-20.0"
+                             prefWidth="150.0"/>
+               </HBox>
             </VBox>
-            <HBox alignment="CENTER_RIGHT" prefHeight="25.0" prefWidth="136.0">
-               <Label prefWidth="25.0" text="Od" />
-               <TextField fx:id="Od" onAction="#mudarPerspectiva" prefHeight="25.0" prefWidth="150.0" />
-            </HBox>
-            <HBox alignment="CENTER_RIGHT" prefHeight="25.0" prefWidth="136.0">
-               <Label prefWidth="25.0" text="Ks" />
-               <TextField fx:id="Ks" onAction="#mudarPerspectiva" prefHeight="25.0" prefWidth="150.0" />
-            </HBox>
+            <padding>
+               <Insets right="16.0" />
+            </padding>
          </VBox>
       </AnchorPane>
    </left>
    <center>
-      <AnchorPane fx:id="janela" prefHeight="500.0" prefWidth="500.0" BorderPane.alignment="CENTER">
-         <Canvas fx:id="desenho" height="800.0" width="800.0" />
+      <AnchorPane prefHeight="500.0" prefWidth="500.0" BorderPane.alignment="CENTER">
+         <Canvas fx:id="canvas" height="800.0" width="800.0" />
       </AnchorPane>
    </center>
    <right>
       <AnchorPane prefHeight="500.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <VBox alignment="CENTER" prefHeight="500.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <children>
-                  <VBox alignment="TOP_CENTER" spacing="8.0">
-                     <children>
-                        <Label text="Light" />
-                        <HBox alignment="CENTER_RIGHT">
-                           <children>
-                              <Label text="R">
-                                 <HBox.margin>
-                                    <Insets right="16.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <MFXSlider fx:id="sliderIambR" bidirectional="false" enableKeyboard="false" max="255.0" prefWidth="150.0" />
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
-                           <children>
-                              <Label text="G">
-                                 <HBox.margin>
-                                    <Insets right="16.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <MFXSlider fx:id="sliderIambG" bidirectional="false" enableKeyboard="false" max="255.0" prefWidth="150.0" />
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="44.0">
-                           <children>
-                              <Label text="B">
-                                 <HBox.margin>
-                                    <Insets right="16.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <MFXSlider fx:id="sliderIambB" enableKeyboard="false" max="255.0" prefWidth="150.0" />
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="85.0">
-                           <children>
-                              <Label text="Ka">
-                                 <HBox.margin>
-                                    <Insets right="16.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <MFXSlider fx:id="sliderKa" decimalPrecision="2" enableKeyboard="false" max="1.0" prefWidth="150.0" />
-                           </children>
-                        </HBox>
-                     </children>
-                  </VBox>
-                  <VBox alignment="TOP_CENTER" spacing="8.0">
-                     <children>
-                        <Label text="Pl" />
-                        <HBox alignment="CENTER_RIGHT">
-                           <children>
-                              <Label text="X">
-                                 <HBox.margin>
-                                    <Insets right="16.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <MFXSlider fx:id="sliderPlX" enableKeyboard="false" max="1000.0" min="-1000.0" prefWidth="150.0" />
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
-                           <Label text="Y">
-                              <HBox.margin>
-                                 <Insets right="16.0" />
-                              </HBox.margin>
-                           </Label>
-                           <MFXSlider fx:id="sliderPlY" enableKeyboard="false" max="1000.0" min="-1000.0" prefWidth="150.0" />
-                        </HBox>
-                        <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="44.0">
-                           <Label text="Z">
-                              <HBox.margin>
-                                 <Insets right="16.0" />
-                              </HBox.margin>
-                           </Label>
-                           <MFXSlider fx:id="sliderPlZ" enableKeyboard="false" max="1000.0" min="-1000.0" prefWidth="150.0" />
-                        </HBox>
-                     </children>
-                  </VBox>
-                  <VBox alignment="TOP_CENTER" spacing="8.0">
-                     <Label text="Il" />
-                     <HBox alignment="CENTER_RIGHT">
-                        <children>
-                           <Label text="R">
-                              <HBox.margin>
-                                 <Insets right="16.0" />
-                              </HBox.margin>
-                           </Label>
-                           <MFXSlider fx:id="sliderIlR" enableKeyboard="false" max="255.0" prefWidth="150.0" />
-                        </children>
-                     </HBox>
-                     <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
-                        <Label text="G">
-                           <HBox.margin>
-                              <Insets right="16.0" />
-                           </HBox.margin>
-                        </Label>
-                        <MFXSlider fx:id="sliderIlG" enableKeyboard="false" max="255.0" prefWidth="150.0" />
-                     </HBox>
-                     <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="44.0">
-                        <Label text="B">
-                           <HBox.margin>
-                              <Insets right="16.0" />
-                           </HBox.margin>
-                        </Label>
-                        <MFXSlider fx:id="sliderIlB" enableKeyboard="false" max="255.0" prefWidth="150.0" />
-                     </HBox>
-                  </VBox>
-                  <VBox alignment="TOP_CENTER" spacing="8.0">
-                     <Label text="Kd" />
-                     <HBox alignment="CENTER_RIGHT">
-                        <children>
-                           <Label text="R">
-                              <HBox.margin>
-                                 <Insets right="16.0" />
-                              </HBox.margin>
-                           </Label>
-                           <MFXSlider fx:id="sliderKdR" enableKeyboard="false" max="255.0" prefWidth="150.0" />
-                        </children>
-                     </HBox>
-                     <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
-                        <Label text="G">
-                           <HBox.margin>
-                              <Insets right="16.0" />
-                           </HBox.margin>
-                        </Label>
-                        <MFXSlider fx:id="sliderKdG" enableKeyboard="false" max="255.0" prefWidth="150.0" />
-                     </HBox>
-                     <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="44.0">
-                        <Label text="B">
-                           <HBox.margin>
-                              <Insets right="16.0" />
-                           </HBox.margin>
-                        </Label>
-                        <MFXSlider fx:id="sliderKdB" enableKeyboard="false" max="255.0" prefWidth="150.0" />
-                     </HBox>
-                  </VBox>
-                  <VBox alignment="TOP_CENTER" spacing="8.0">
-                     <children>
-                        <Label text="Eta" />
-                        <HBox alignment="CENTER_RIGHT">
-                           <children>
-                              <MFXSlider fx:id="sliderEta" bidirectional="false" decimalPrecision="2" enableKeyboard="false" prefWidth="150.0" />
-                           </children>
-                        </HBox>
-                     </children>
-                  </VBox>
-               </children>
+         <VBox alignment="CENTER" prefHeight="500.0" prefWidth="225.0" AnchorPane.bottomAnchor="0.0"
+               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="0.0">
+            <padding>
+               <Insets left="16.0"/>
+            </padding>
+            <VBox alignment="TOP_CENTER" prefHeight="117.0" prefWidth="225.0" spacing="8.0">
+               <Label text="Light"/>
+               <HBox alignment="CENTER_RIGHT" prefWidth="225.0">
+                  <Label text="R">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderIambR" bidirectional="false" enableKeyboard="false" max="255.0"
+                             prefWidth="150.0"/>
+               </HBox>
+               <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
+                  <Label text="G">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderIambG" bidirectional="false" enableKeyboard="false" max="255.0"
+                             prefWidth="150.0"/>
+               </HBox>
+               <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="44.0">
+                  <Label text="B">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderIambB" enableKeyboard="false" max="255.0" prefWidth="150.0"/>
+               </HBox>
             </VBox>
-         </children>
+            <VBox alignment="TOP_CENTER" prefWidth="225.0" spacing="8.0">
+               <Label text="Ka"/>
+               <HBox alignment="CENTER_RIGHT">
+                  <MFXSlider fx:id="sliderKa" decimalPrecision="2" enableKeyboard="false" max="1.0"
+                             prefWidth="150.0"/>
+               </HBox>
+            </VBox>
+            <VBox alignment="TOP_CENTER" prefWidth="225.0" spacing="8.0">
+               <Label text="Pl"/>
+               <HBox alignment="CENTER_RIGHT">
+                  <Label text="X">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderPlX" enableKeyboard="false" max="1000.0" min="-1000.0"
+                             prefWidth="150.0"/>
+               </HBox>
+               <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
+                  <Label text="Y">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderPlY" enableKeyboard="false" max="1000.0" min="-1000.0"
+                             prefWidth="150.0"/>
+               </HBox>
+               <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="44.0">
+                  <Label text="Z">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderPlZ" enableKeyboard="false" max="1000.0" min="-1000.0"
+                             prefWidth="150.0"/>
+               </HBox>
+            </VBox>
+            <VBox alignment="TOP_CENTER" prefWidth="225.0" spacing="8.0">
+               <Label text="Il"/>
+               <HBox alignment="CENTER_RIGHT">
+                  <Label text="R">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderIlR" enableKeyboard="false" max="255.0" prefWidth="150.0"/>
+               </HBox>
+               <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
+                  <Label text="G">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderIlG" enableKeyboard="false" max="255.0" prefWidth="150.0"/>
+               </HBox>
+               <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="44.0">
+                  <Label text="B">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderIlB" enableKeyboard="false" max="255.0" prefWidth="150.0"/>
+               </HBox>
+            </VBox>
+            <VBox alignment="TOP_CENTER" prefWidth="225.0" spacing="8.0">
+               <Label text="Kd"/>
+               <HBox alignment="CENTER_RIGHT">
+                  <Label text="R">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderKdR" enableKeyboard="false" max="255.0" prefWidth="150.0"/>
+               </HBox>
+               <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
+                  <Label text="G">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderKdG" enableKeyboard="false" max="255.0" prefWidth="150.0"/>
+               </HBox>
+               <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="44.0">
+                  <Label text="B">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderKdB" enableKeyboard="false" max="255.0" prefWidth="150.0"/>
+               </HBox>
+            </VBox>
+            <VBox alignment="TOP_CENTER" prefWidth="225.0" spacing="8.0">
+               <Label text="Eta"/>
+               <HBox alignment="CENTER_RIGHT">
+                  <MFXSlider fx:id="sliderEta" bidirectional="false" decimalPrecision="2"
+                             enableKeyboard="false" prefWidth="150.0"/>
+               </HBox>
+            </VBox>
+            <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="499.0" prefWidth="225.0" spacing="8.0">
+               <Label text="Od"/>
+               <HBox alignment="CENTER_RIGHT">
+                  <Label text="R">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderOdR" decimalPrecision="2" enableKeyboard="false" max="1.0"
+                             prefWidth="150.0"/>
+               </HBox>
+               <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="27.0">
+                  <Label text="G">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderOdG" decimalPrecision="2" enableKeyboard="false" max="1.0"
+                             prefWidth="150.0"/>
+               </HBox>
+               <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="44.0">
+                  <Label text="B">
+                     <HBox.margin>
+                        <Insets right="16.0"/>
+                     </HBox.margin>
+                  </Label>
+                  <MFXSlider fx:id="sliderOdB" decimalPrecision="2" enableKeyboard="false" max="1.0"
+                             prefWidth="150.0"/>
+               </HBox>
+            </VBox>
+            <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="545.0" prefWidth="225.0" spacing="8.0">
+               <Label text="Ks"/>
+               <HBox alignment="CENTER_RIGHT">
+                  <MFXSlider fx:id="sliderKs" bidirectional="false" decimalPrecision="2" enableKeyboard="false"
+                             max="1.0" prefWidth="150.0"/>
+               </HBox>
+            </VBox>
+         </VBox>
       </AnchorPane>
    </right>
 </BorderPane>

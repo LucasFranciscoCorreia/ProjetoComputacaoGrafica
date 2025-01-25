@@ -3,16 +3,11 @@ package br.ufrpe.computacaografica.control
 import br.ufrpe.computacaografica.beans.*
 import br.ufrpe.computacaografica.beans.Vector
 import io.github.palexdev.materialfx.controls.MFXSlider
-import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
-import javafx.scene.control.Button
-import javafx.scene.control.Label
-import javafx.scene.control.TextField
 import javafx.scene.image.WritableImage
-import javafx.scene.layout.AnchorPane
 import javafx.scene.paint.Color
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -28,58 +23,7 @@ import kotlin.math.pow
 
 class Window : Initializable {
     @FXML
-    private lateinit var nValue: TextField
-
-    @FXML
-    private lateinit var vValue: TextField 
-
-    @FXML
-    private lateinit var dValue: TextField
-
-    @FXML
-    private lateinit var hxValue: TextField
-
-    @FXML
-    private lateinit var hyValue: TextField
-
-    @FXML
-    private lateinit var cValue: TextField
-
-    @FXML
-    private lateinit var Iamb: TextField
-
-    @FXML
-    private lateinit var Ka: TextField
-
-    @FXML
-    private lateinit var iL: TextField
-
-    @FXML
-    private lateinit var Pl: TextField
-
-    @FXML
-    private lateinit var Kd: TextField
-
-    @FXML
-    private lateinit var Od: TextField
-
-    @FXML
-    private lateinit var Ks: TextField
-
-    @FXML
-    private lateinit var eta: TextField
-
-    @FXML
-    private lateinit var calcular: Button
-
-    @FXML
-    private lateinit var alerta: Label
-
-    @FXML
-    private lateinit var janela: AnchorPane
-
-    @FXML
-    private lateinit var desenho: Canvas
+    private lateinit var canvas: Canvas
 
     @FXML
     private lateinit var sliderCameraX: MFXSlider
@@ -159,11 +103,22 @@ class Window : Initializable {
     @FXML
     private lateinit var sliderEta: MFXSlider
 
+    @FXML
+    private lateinit var sliderOdR: MFXSlider
+
+    @FXML
+    private lateinit var sliderOdG: MFXSlider
+
+    @FXML
+    private lateinit var sliderOdB: MFXSlider
+
+    @FXML
+    private lateinit var sliderKs: MFXSlider
 
 
-    private lateinit var p: Array<Point>
-    private lateinit var t: Array<Triangle>
-    private lateinit var tela: Array<Array<Pixel>>
+    private lateinit var points: Array<Point>
+    private lateinit var triangles: Array<Triangle>
+    private lateinit var screen: Array<Array<Pixel>>
     private lateinit var U: Vector
     private lateinit var V: Vector
     private lateinit var N: Vector
@@ -188,11 +143,11 @@ class Window : Initializable {
     private val height = 800
     private val width = 800
 
-    private  fun readCameraEIluminacao() {
+    private  fun readCameraAndLight() {
         var reader = BufferedReader(FileReader("camera.txt"))
 
-        var linha = reader.readLine()
-        var qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        var line = reader.readLine()
+        var qnt = line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
         var a = qnt[0].toDouble()
         var b = qnt[1].toDouble()
@@ -202,8 +157,8 @@ class Window : Initializable {
         sliderNY.value = b
         sliderNZ.value = c
 
-        linha = reader.readLine()
-        qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        line = reader.readLine()
+        qnt = line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         a = qnt[0].toDouble()
         b = qnt[1].toDouble()
         c = qnt[2].toDouble()
@@ -218,8 +173,8 @@ class Window : Initializable {
         sliderHY.value = reader.readLine().toDouble()
 
 
-        linha = reader.readLine()
-        qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        line = reader.readLine()
+        qnt = line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         a = qnt[0].toDouble()
         b = qnt[1].toDouble()
         c = qnt[2].toDouble()
@@ -229,8 +184,8 @@ class Window : Initializable {
 
         reader.close()
         reader = BufferedReader(FileReader("iluminacao.txt"))
-        linha = reader.readLine()
-        qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        line = reader.readLine()
+        qnt = line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         a = qnt[0].toDouble()
         b = qnt[1].toDouble()
         c = qnt[2].toDouble()
@@ -238,10 +193,11 @@ class Window : Initializable {
         this.sliderIambG.value = b
         this.sliderIambB.value = c
 
+
         sliderKa.value = reader.readLine().toDouble()
 
-        linha = reader.readLine()
-        qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        line = reader.readLine()
+        qnt = line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         a = qnt[0].toDouble()
         b = qnt[1].toDouble()
         c = qnt[2].toDouble()
@@ -249,8 +205,8 @@ class Window : Initializable {
         this.sliderIlG.value = b
         this.sliderIlB.value = c
 
-        linha = reader.readLine()
-        qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        line = reader.readLine()
+        qnt = line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         a = qnt[0].toDouble()
         b = qnt[1].toDouble()
         c = qnt[2].toDouble()
@@ -258,8 +214,8 @@ class Window : Initializable {
         this.sliderPlZ.value = b
         this.sliderPlY.value = c
 
-        linha = reader.readLine()
-        qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        line = reader.readLine()
+        qnt = line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         a = qnt[0].toDouble()
         b = qnt[1].toDouble()
         c = qnt[2].toDouble()
@@ -267,8 +223,16 @@ class Window : Initializable {
         this.sliderKdG.value = b
         this.sliderKdB.value = c
 
-        Od.text = reader.readLine()
-        Ks.text = reader.readLine()
+        line = reader.readLine()
+        qnt = line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        a = qnt[0].toDouble()
+        b = qnt[1].toDouble()
+        c = qnt[2].toDouble()
+        this.sliderOdR.value = a
+        this.sliderOdG.value = b
+        this.sliderOdB.value = c
+
+        sliderKs.value = reader.readLine().toDouble()
         sliderEta.value = reader.readLine().toDouble()
         reader.close()
     }
@@ -287,45 +251,43 @@ class Window : Initializable {
 
         this.etaValue = sliderEta.value
         this.KaValue = sliderKa.value
-        this.KsValue = Ks.text.toDouble()
+        this.KsValue = sliderKs.value
 
         this.IambValue = Vector(arrayOf(sliderIambR.value, sliderIambG.value, sliderIambB.value))
 
 
         this.KdValue = Vector(arrayOf(sliderKdR.value, sliderKdG.value, sliderKdB.value))
 
-        var linha = Od.text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        this.OdValue = Vector(arrayOf( linha[0].toDouble(),linha[1].toDouble(), linha[2].toDouble()))
+        this.OdValue = Vector(arrayOf(sliderOdR.value, sliderOdG.value, sliderOdB.value))
 
         this.PlValue = Vector(arrayOf(sliderPlX.value, sliderPlZ.value, sliderPlY.value))
 
         this.IlValue = Vector(arrayOf(sliderIlR.value, sliderIlG.value, sliderIlB.value))
     }
 
-    private fun iniciarTela() {
-        this.tela = Array(height) { Array(width) { Pixel(Color.BLACK) }}
+    private fun startScreen() {
+        this.screen = Array(height) { Array(width) { Pixel(Color.BLACK) }}
         this.gc.fill = Color.BLACK
         this.gc.fillRect(0.0, 0.0, width.toDouble(), height.toDouble())
     }
 
-    override  fun initialize(arg0: URL?, arg1: ResourceBundle?) {
-        fun updateFrame(){
-            if(job?.isActive == true) job!!.cancel(CancellationException())
+    override fun initialize(arg0: URL?, arg1: ResourceBundle?) {
+        fun updateFrame() {
+            if (job?.isActive == true) job!!.cancel(CancellationException())
             runBlocking {
                 job = launch {
-                    this@Window.mudarPerspectiva(null)
+                    this@Window.changePerspective()
 
                 }
             }
-            println("C.x ${sliderCameraX.value}")
         }
         try {
             writableImage = WritableImage(width, height)
-            this.readCameraEIluminacao()
-            this.gc = desenho.graphicsContext2D
-            this.iniciarTela()
-            this.getPontosArquivo()
-            this.mudarPerspectiva(null)
+            this.readCameraAndLight()
+            this.gc = canvas.graphicsContext2D
+            this.startScreen()
+            this.getPointsInArchive()
+            this.changePerspective()
             this.sliderCameraX.valueProperty().addListener { _, _, newValue ->
                 updateFrame()
             }
@@ -404,6 +366,18 @@ class Window : Initializable {
             this.sliderEta.valueProperty().addListener { _, _, newValue ->
                 updateFrame()
             }
+            this.sliderOdR.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderOdG.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderOdB.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
+            this.sliderKs.valueProperty().addListener { _, _, newValue ->
+                updateFrame()
+            }
         } catch (var4: IOException) {
             var4.printStackTrace()
         }
@@ -411,186 +385,135 @@ class Window : Initializable {
 
     @FXML
     @Throws(IOException::class)
-     fun mudarPerspectiva(event: ActionEvent?) {
+     fun changePerspective() {
         this.readData()
-        this.ortogonizarV()
-        this.getPontosArquivo()
-        this.setReferenciasOriginaisDosTriangulos()
-        this.atualizarCoordVista()
-        this.normalTriangulo()
-        this.normalVertice()
-        this.pintarTela()
-        //this.salvarPontosArquivo()
-        //readCameraEIluminacao()
+        this.orthogonizeV()
+        this.getPointsInArchive()
+        this.setTrianglesOriginalReferences()
+        this.updateScreenCoord()
+        this.normalTriangles()
+        this.normalPoints()
+        this.changeScreen()
     }
-    private  fun ortogonizarV() {
-        val orto = V.multEscalar(N) / N.multEscalar(N)
+    private fun orthogonizeV() {
+        val ortho = V.scalarMultiplication(N) / N.scalarMultiplication(N)
         val n = N.v
-        val vaux = arrayOf(orto * n[0], orto * n[1], orto * n[2])
+        val vaux = arrayOf(ortho * n[0], ortho * n[1], ortho * n[2])
         V.v[0] -= vaux[0]
         V.v[1] -= vaux[1]
         V.v[2] -= vaux[2]
-        this.N = N.normalizarVetor()
-        this.V = V.normalizarVetor()
-        this.U = N.produtoVetorial(V)
+        this.N = N.normalizeVector()
+        this.V = V.normalizeVector()
+        this.U = N.crossProduct(V)
     }
 
-    @Throws(IOException::class)
-    private fun salvarPontosArquivo() {
-        var writer = BufferedWriter(FileWriter("camera.txt"))
-        writer.write(nValue.text)
-        writer.newLine()
-        writer.write(vValue.text)
-        writer.newLine()
-        writer.write(dValue.text)
-        writer.newLine()
-        writer.write(hxValue.text)
-        writer.newLine()
-        writer.write(hyValue.text)
-        writer.newLine()
-        writer.write(cValue.text)
-        writer.newLine()
-        writer.flush()
-        writer.close()
-        writer = BufferedWriter(FileWriter("iluminacao.txt"))
-        writer.write(Iamb.text)
-        writer.newLine()
-        writer.write(Ka.text)
-        writer.newLine()
-        writer.write(iL.text)
-        writer.newLine()
-        writer.write(Pl.text)
-        writer.newLine()
-        writer.write(Kd.text)
-        writer.newLine()
-        writer.write(Od.text)
-        writer.newLine()
-        writer.write(Ks.text)
-        writer.newLine()
-        writer.write(eta.text)
-        writer.newLine()
-        writer.flush()
-        writer.close()
-    }
-
-    var el: Int = 0
-    private  fun pintarTela() {
-        var cont = 0
-        writableImage = WritableImage(width, height)
+    private fun changeScreen() {
         val pixelWriter = writableImage.pixelWriter
-        t.forEach { triangle ->
-            val pontoA = this.projetaPontoNaTela(triangle.p[0])
-            val pontoB = this.projetaPontoNaTela(triangle.p[1])
-            val pontoC = this.projetaPontoNaTela(triangle.p[2])
-            triangle.tela = arrayOf(Point(pontoA), Point(pontoB), Point(pontoC))
-            cont++
-            println(cont)
+        triangles.forEach { triangle ->
+            val pointA = this.projectPointOnScreen(triangle.points[0])
+            val pointB = this.projectPointOnScreen(triangle.points[1])
+            val pointC = this.projectPointOnScreen(triangle.points[2])
+            triangle.screen = arrayOf(Point(pointA), Point(pointB), Point(pointC))
         }
-        cont = 0
-        println("iniciando tela")
-        iniciarTela()
-        println("tela finaliazada")
-        println("iniciando rasterização")
-        t.forEach { triangle ->
+
+        startScreen()
+
+        triangles.forEach { triangle ->
             scanLine(triangle)
-            cont++
-            println(cont)
         }
-        println("finalizando rasterizaçao")
-        for (i in tela.indices){
-            for (j in tela[i].indices){
-                    pixelWriter.setColor(i, j, tela[i][j].color)
+
+        for (i in screen.indices){
+            for (j in screen[i].indices){
+                    pixelWriter.setColor(i, j, screen[i][j].color)
             }
         }
 
         gc.drawImage(writableImage, 0.0, 0.0)
-        println("Canvas atualizado com writable image")
-        el = el+50
     }
 
     private  fun scanLine(t: Triangle) {
-        var ymin: Double = t.tela[0].p[1].coerceAtMost(t.tela[1].p[1])
-        ymin = ymin.coerceAtMost(t.tela[2].p[1])
-        lateinit var inicio: Point
-        lateinit var meio: Point
-        lateinit var fim: Point
-        if (ymin == t.tela[0].p[1]) {
-            inicio = t.tela[0]
-            if (t.tela[1].p[1] <= t.tela[2].p[1]) {
-                meio = t.tela[1]
-                fim = t.tela[2]
+        var ymin: Double = t.screen[0].points[1].coerceAtMost(t.screen[1].points[1])
+        ymin = ymin.coerceAtMost(t.screen[2].points[1])
+        lateinit var start: Point
+        lateinit var middle: Point
+        lateinit var finish: Point
+        if (ymin == t.screen[0].points[1]) {
+            start = t.screen[0]
+            if (t.screen[1].points[1] <= t.screen[2].points[1]) {
+                middle = t.screen[1]
+                finish = t.screen[2]
             } else {
-                meio = t.tela[2]
-                fim = t.tela[1]
+                middle = t.screen[2]
+                finish = t.screen[1]
             }
-        } else if (ymin == t.tela[1].p[1]) {
-            inicio = t.tela[1]
-            if (t.tela[0].p[1] <= t.tela[2].p[1]) {
-                meio = t.tela[0]
-                fim = t.tela[2]
+        } else if (ymin == t.screen[1].points[1]) {
+            start = t.screen[1]
+            if (t.screen[0].points[1] <= t.screen[2].points[1]) {
+                middle = t.screen[0]
+                finish = t.screen[2]
             } else {
-                meio = t.tela[2]
-                fim = t.tela[0]
+                middle = t.screen[2]
+                finish = t.screen[0]
             }
         } else {
-            inicio = t.tela[2]
-            if (t.tela[1].p[1] <= t.tela[0].p[1]) {
-                meio = t.tela[1]
-                fim = t.tela[0]
+            start = t.screen[2]
+            if (t.screen[1].points[1] <= t.screen[0].points[1]) {
+                middle = t.screen[1]
+                finish = t.screen[0]
             } else {
-                meio = t.tela[0]
-                fim = t.tela[1]
+                middle = t.screen[0]
+                finish = t.screen[1]
             }
         }
-        this.pintarTopDown(inicio, meio, fim, t)
-        this.pintarDownTop(inicio, meio, fim, t)
+        this.paintTopDown(start, middle, finish, t)
+        this.paintDownTop(start, middle, finish, t)
     }
 
-    private  fun calcularAlphaBeta(inicio: Point, meio: Point, fim: Point): Pair<Double, Double> {
+    private  fun calculateAlphaBeta(start: Point, middle: Point, finis: Point): Pair<Double, Double> {
         val alpha: Double
         val beta: Double
-        if (meio.p[0] < inicio.p[0]) {
-            alpha = (meio.p[0] - fim.p[0]) / (meio.p[1] - fim.p[1])
-            beta = (inicio.p[0] - fim.p[0]) / (inicio.p[1] - fim.p[1])
+        if (middle.points[0] < start.points[0]) {
+            alpha = (middle.points[0] - finis.points[0]) / (middle.points[1] - finis.points[1])
+            beta = (start.points[0] - finis.points[0]) / (start.points[1] - finis.points[1])
         } else {
-            alpha = (inicio.p[0] - fim.p[0]) / (inicio.p[1] - fim.p[1])
-            beta = (meio.p[0] - fim.p[0]) / (meio.p[1] - fim.p[1])
+            alpha = (start.points[0] - finis.points[0]) / (start.points[1] - finis.points[1])
+            beta = (middle.points[0] - finis.points[0]) / (middle.points[1] - finis.points[1])
         }
         return Pair(alpha, beta)
     }
 
-    private  fun pintarDownTop(inicio: Point, meio: Point, fim: Point, t: Triangle) {
+    private  fun paintDownTop(start: Point, middle: Point, finish: Point, triangle: Triangle) {
          fun paint(alpha: Double, beta: Double){
-            var xmax: Double = fim.p[0]
-            var xmin: Double = fim.p[0]
+            var xmax: Double = finish.points[0]
+            var xmin: Double = finish.points[0]
 
-            val min = fim.p[1].toInt()
-            val max = meio.p[1].toInt()
+            val min = finish.points[1].toInt()
+            val max = middle.points[1].toInt()
             for (y in min downTo max) {
                 val ini = Math.round(xmin).toInt()
                 val end = Math.round(xmax).toInt()
                 runBlocking { repeat(end-ini+1){ i->
                     launch {
                         val x = ini+i
-                        calcularCor(x.toDouble(), y.toDouble(), t)
+                        calculateColor(x.toDouble(), y.toDouble(), triangle)
                     }
                 } }
                 xmin -= alpha
                 xmax -= beta
             }
         }
-        val (alpha: Double, beta: Double) = calcularAlphaBeta(inicio, meio, fim)
+        val (alpha: Double, beta: Double) = calculateAlphaBeta(start, middle, finish)
         paint(alpha, beta)
         paint(beta, alpha)
     }
 
-    private fun pintarTopDown(inicio: Point, meio: Point, fim: Point, t: Triangle) {
-         fun pintar (alpha: Double, beta: Double){
-            var xmax: Double = inicio.p[0]
-            var xmin: Double = inicio.p[0]
+    private fun paintTopDown(start: Point, middle: Point, finish: Point, triangle: Triangle) {
+         fun paint (alpha: Double, beta: Double){
+            var xmax: Double = start.points[0]
+            var xmin: Double = start.points[0]
 
-             val min = inicio.p[1].toInt()
-             val max = meio.p[1].toInt()
+             val min = start.points[1].toInt()
+             val max = middle.points[1].toInt()
 
             for (y in min..max) {
                 val ini = xmin.toInt()
@@ -598,60 +521,60 @@ class Window : Initializable {
                 runBlocking { repeat(end-ini+1){ i->
                     launch {
                         val x = ini+i
-                        calcularCor(x.toDouble(), y.toDouble(), t)
+                        calculateColor(x.toDouble(), y.toDouble(), triangle)
                     }
                 } }
                 for(x in ini..end){
-                    this.calcularCor(x.toDouble(), y.toDouble(), t)
+                    this.calculateColor(x.toDouble(), y.toDouble(), triangle)
                 }
 
                 xmin += alpha
                 xmax += beta
             }
         }
-        val (alpha,beta) = calcularAlphaBeta(fim, meio, inicio)
-        pintar(alpha, beta)
-        pintar(beta, alpha)
+        val (alpha,beta) = calculateAlphaBeta(finish, middle, start)
+        paint(alpha, beta)
+        paint(beta, alpha)
     }
 
-    private fun calcularCor(x: Double, y: Double, t: Triangle) {
-        t.p[0].normal = t.original[0].normal
-        t.p[1].normal = t.original[1].normal
-        t.p[2].normal = t.original[2].normal
-        val q: Array<Double> = Point.coordenadaBaricentrica(t.tela[0], t.tela[1], t.tela[2], Point(arrayOf(x, y)))
-        val p: Point =Point.calcularPontoCoordenadaBaricentrica(t.p[0], t.p[1], t.p[2], q[0], q[1], 1.0 - q[0] - q[1])
+    private fun calculateColor(x: Double, y: Double, t: Triangle) {
+        t.points[0].normal = t.original[0].normal
+        t.points[1].normal = t.original[1].normal
+        t.points[2].normal = t.original[2].normal
+        val q: Array<Double> = Point.barycentricCoordinate(t.screen[0], t.screen[1], t.screen[2], Point(arrayOf(x, y)))
+        val p: Point = Point.calculatePointBarycentricCoordinate(t.points[0], t.points[1], t.points[2], q[0], q[1], 1.0 - q[0] - q[1])
         val origem = Point(arrayOf(0.0, 0.0, 0.0))
-        val n1 = Vector(this.produtoPorEscalar(t.p[0].normal, q[0]))
-        val n2 = Vector(this.produtoPorEscalar(t.p[1].normal, q[1]))
-        val n3 = Vector(this.produtoPorEscalar(t.p[2].normal, 1.0 - q[0] - q[1]))
-        p.normal = n1.mais(n2).mais(n3).normalizarVetor().v
+        val n1 = Vector(t.points[0].normal).multiplyByScalar(q[0])
+        val n2 = Vector(t.points[1].normal).multiplyByScalar(q[1])
+        val n3 = Vector(t.points[2].normal).multiplyByScalar(1.0 - q[0] - q[1])
+        p.normal = n1.add(n2).add(n3).normalizeVector().v
         val N = Vector(p.normal)
-        val V = Vector(origem.subtrai(p).normalizarVetor().v)
-        val L = Vector(PlValue.menos(Vector(p.p)).normalizarVetor().v)
-        val R = Vector(calcularR(N, L).normalizarVetor().v)
+        val V = Vector(origem.subtract(p).normalizeVector().v)
+        val L = Vector(PlValue.subtract(Vector(p.points)).normalizeVector().v)
+        val R = Vector(calculateR(N, L).normalizeVector().v)
         lateinit var Id: Array<Double>
         lateinit var Is: Array<Double>
-        val Ia = this.produtoPorEscalar(IambValue.v, this.KaValue)
+        val Ia = Vector(IambValue.v).multiplyByScalar(this.KaValue)
 
-        if (N.multEscalar(L) < 0.0) {
-            if (N.multEscalar(V) < 0.0) {
+        if (N.scalarMultiplication(L) < 0.0) {
+            if (N.scalarMultiplication(V) < 0.0) {
                 N.v = arrayOf(-N.v[0], -N.v[1],-N.v[2])
-                Is = IlValue.multPorEscalar(this.KsValue * (R).multEscalar(V).pow(this.etaValue)).v
-                Id = KdValue.multInterno(IlValue.multInterno(OdValue.multPorEscalar(N.multEscalar(L)))).v
+                Is = IlValue.multiplyByScalar(this.KsValue * (R).scalarMultiplication(V).pow(this.etaValue)).v
+                Id = KdValue.elementWiseMultiplication(IlValue.elementWiseMultiplication(OdValue.multiplyByScalar(N.scalarMultiplication(L)))).v
             } else {
-                Is = origem.p
-                Id = origem.p
+                Is = origem.points
+                Id = origem.points
             }
         }else{
-            Is = IlValue.multPorEscalar(this.KsValue * (R).multEscalar(V).pow(this.etaValue)).v
-            Id = KdValue.multInterno(IlValue.multInterno(OdValue.multPorEscalar(N.multEscalar(L)))).v
+            Is = IlValue.multiplyByScalar(this.KsValue * (R).scalarMultiplication(V).pow(this.etaValue)).v
+            Id = KdValue.elementWiseMultiplication(IlValue.elementWiseMultiplication(OdValue.multiplyByScalar(N.scalarMultiplication(L)))).v
         }
 
-        if (R.multEscalar(V) < 0.0) {
-            Is = origem.p
+        if (R.scalarMultiplication(V) < 0.0) {
+            Is = origem.points
         }
 
-        val I = (Vector(Ia)).mais(Vector(Id)).mais(Vector(Is))
+        val I = Ia.add(Vector(Id)).add(Vector(Is))
 
         I.v = arrayOf(
             min(max(I.v[0], 0.0), 255.0),
@@ -659,135 +582,121 @@ class Window : Initializable {
             min(max(I.v[2], 0.0), 255.0)
         )
 
-        p.p[2] = -p.p[2]
-        this.organizarZ(x.toInt(), y.toInt(), p.p[2], Color.rgb(I.v[0].toInt(), I.v[1].toInt(), I.v[2].toInt()))
+        p.points[2] = -p.points[2]
+        this.organizeZ(x.toInt(), y.toInt(), p.points[2], Color.rgb(I.v[0].toInt(), I.v[1].toInt(), I.v[2].toInt()))
     }
 
-    private fun organizarZ(i: Int, j: Int, profundidadeAtual: Double, cor: Color) {
+    private fun organizeZ(i: Int, j: Int, actualDepth: Double, color: Color) {
 
-        if (i in 0 until width && j in 0 until height && tela[i][j].profundidade < profundidadeAtual) {
-            tela[i][j].profundidade = profundidadeAtual
-            tela[i][j].color = cor
+        if (i in 0 until width && j in 0 until height && screen[i][j].depth < actualDepth) {
+            screen[i][j].depth = actualDepth
+            screen[i][j].color = color
             //pixelWriter.setColor(i, j, cor)
         }
     }
 
-    private fun calcularR(N: Vector, L: Vector): Vector = Vector(N.multPorEscalar(2.0 * N.multEscalar(L)).v.mapIndexed { i, value -> value - L.v[i] }.toTypedArray())
+    private fun calculateR(N: Vector, L: Vector): Vector = Vector(N.multiplyByScalar(2.0 * N.scalarMultiplication(L)).v.mapIndexed { i, value -> value - L.v[i] }.toTypedArray())
 
-    private fun produtoPorEscalar(vet: Array<Double>, escalar: Double): Array<Double> = arrayOf(vet[0] * escalar, vet[1] * escalar, vet[2] * escalar)
-
-    private fun projetaPontoNaTela(a: Point): Array<Double> {
-        val pontoA = arrayOf(
-            this.d * a.p[0] / (a.p[2] * this.hx),
-            this.d * a.p[1] / (a.p[2] * this.hy)
+    private fun projectPointOnScreen(a: Point): Array<Double> {
+        val pointA = arrayOf(
+            this.d * a.points[0] / (a.points[2] * this.hx),
+            this.d * a.points[1] / (a.points[2] * this.hy)
         )
-        pontoA[0] = floor((pontoA[0] + 1.0) / 2.0 * height.toDouble() + 0.5)
-        pontoA[1] = floor(width.toDouble() - (pontoA[1] + 1.0) / 2.0 * width.toDouble() + 0.5)
-        return pontoA
+        pointA[0] = floor((pointA[0] + 1.0) / 2.0 * height.toDouble() + 0.5)
+        pointA[1] = floor(width.toDouble() - (pointA[1] + 1.0) / 2.0 * width.toDouble() + 0.5)
+        return pointA
     }
 
-    private fun normalVertice() {
-        for (ponto in this.p) {
-            val norm = normalDeUmVertice(ponto).let { normalVertice ->
-                Vector(normalVertice).normalizarVetor().let { normalVetor ->
-                    normalVetor.v
-                }
+    private fun normalPoints() {
+        for (point in this.points) {
+            val norm = pointsNormal(point).let { normalVertice ->
+                Vector(normalVertice).normalizeVector().v
             }
-            ponto.normal = Matrix(norm).matriz[0]
+            point.normal = Matrix(norm).matrix[0]
         }
     }
 
-    private fun normalTriangulo() {
-        for (triangulo in this.t) {
-            val normal = this.normalDoTriangulo(triangulo)
-            triangulo.normal = Matrix(normal).matriz[0]
+    private fun normalTriangles() {
+        for (triangle in this.triangles) {
+            val normal = this.normalOfATriangle(triangle)
+            triangle.normal = Matrix(normal).matrix[0]
         }
     }
 
-    private fun normalDoTriangulo(triangulo: Triangle): Array<Double> =
-        triangulo.p[0].let { p1 ->
-            triangulo.p[1].let { p2 ->
-                triangulo.p[2].let { p3 ->
-                    p2.subtrai(p1).produtoVetorial(p3.subtrai(p1)).normalizarVetor().v
-                }
-            }
-        }
-
-    private fun atualizarCoordVista() {
-        for (i in t.indices) {
-            this.calcularCoordenadaVista(t[i], this.C)
-        }
-    }
-
-    private fun calcularCoordenadaVista(triangulo: Triangle, c: Point) {
-        triangulo.p = arrayOf(this.coordenadaVista(c, triangulo.p[0]), this.coordenadaVista(c, triangulo.p[1]), this.coordenadaVista(c, triangulo.p[2]))
-    }
-
-    private fun coordenadaVista(c: Point, p: Point): Point =
-        Matrix(this.BaseOrtonormal()).let { ortonormal ->
-            Matrix(p.subtrai(c).v).let { subtracao ->
-                Matrix(subtracao.transposta).let { transposta ->
-                    Point(ortonormal.mult(transposta).transposta[0])
+    private fun normalOfATriangle(triangle: Triangle): Array<Double> =
+        triangle.points[0].let { p1 ->
+            triangle.points[1].let { p2 ->
+                triangle.points[2].let { p3 ->
+                    p2.subtract(p1).crossProduct(p3.subtract(p1)).normalizeVector().v
                 }
             }
         }
 
-    private fun BaseOrtonormal(): Array<Array<Double>> {
+    private fun updateScreenCoord() {
+        for (i in triangles.indices) {
+            this.calculateScreenCoord(triangles[i], this.C)
+        }
+    }
+
+    private fun calculateScreenCoord(triangle: Triangle, c: Point) {
+        triangle.points = arrayOf(this.screenCord(c, triangle.points[0]), this.screenCord(c, triangle.points[1]), this.screenCord(c, triangle.points[2]))
+    }
+
+    private fun screenCord(c: Point, p: Point): Point =
+        Matrix(this.orthogonalBasis()).let { ortonormal ->
+            Matrix(p.subtract(c).v).let { subtract ->
+                Matrix(subtract.transpose).let { transpose ->
+                    Point(ortonormal.multiply(transpose).transpose[0])
+                }
+            }
+        }
+
+    private fun orthogonalBasis(): Array<Array<Double>> {
         val u = U.v
         val v = V.v
         val n = N.v
         return arrayOf(arrayOf(u[0], u[1], u[2]), arrayOf(v[0],v[1], v[2]), arrayOf(n[0], n[1], n[2]))
     }
 
-    private fun setReferenciasOriginaisDosTriangulos() {
-        for (i in t.indices) {
-            t[i].setOriginais()
+    private fun setTrianglesOriginalReferences() {
+        for (i in triangles.indices) {
+            triangles[i].setOriginals()
         }
     }
 
-    private fun getPontosArquivo(){
+    private fun getPointsInArchive(){
         val reader = BufferedReader(FileReader("triangulos.txt"))
-        var linha = reader.readLine()
-        var qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        this.p = Array(qnt[0].toInt()) { Point(0) }
-        this.t = Array(qnt[1].toInt()) { Triangle(Array(0){Point(0)}) }
-        p.forEachIndexed { i, point ->
-            linha = reader.readLine()
-            qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            p[i] = Point(arrayOf(qnt[0].toDouble(), qnt[1].toDouble(), qnt[2].toDouble()))
+        var line = reader.readLine()
+        var qnt = line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        this.points = Array(qnt[0].toInt()) { Point(0) }
+        this.triangles = Array(qnt[1].toInt()) { Triangle(Array(0){Point(0)}) }
+        points.forEachIndexed { i, point ->
+            line = reader.readLine()
+            qnt = line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            points[i] = Point(arrayOf(qnt[0].toDouble(), qnt[1].toDouble(), qnt[2].toDouble()))
         }
 
-        t.forEachIndexed { i, triangle ->
-            linha = reader.readLine()
-            qnt = linha.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        triangles.forEachIndexed { i, triangle ->
+            line = reader.readLine()
+            qnt = line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             val a = qnt[0].toInt()-1
             val b = qnt[1].toInt()-1
             val c = qnt[2].toInt()-1
-            t[i] = Triangle(p[a], p[b], p[c])
-            p[a].triangulos.add(t[i])
-            p[b].triangulos.add(t[i])
-            p[c].triangulos.add(t[i])
+            triangles[i] = Triangle(points[a], points[b], points[c])
+            points[a].triangles.add(triangles[i])
+            points[b].triangles.add(triangles[i])
+            points[c].triangles.add(triangles[i])
         }
 
         reader.close()
     }
 
-    @FXML
-    private fun updateCamera(){
-        val x = this.sliderCameraX.value
-        val y = this.sliderCameraY.value
-        val z = this.sliderCameraZ.value
-        this.C = Point(arrayOf(x, y, z))
-
-        //mudarPerspectiva(null)
-    }
-
     companion object {
-        private fun normalDeUmVertice(vertice: Point): Array<Double> {
+        private fun pointsNormal(point: Point): Array<Double> {
             var normal = Vector(arrayOf(0.0, 0.0, 0.0))
 
-            for (triangulo in vertice.triangulos) {
-                normal = normal.mais(Vector(triangulo.normal))
+            for (triangle in point.triangles) {
+                normal = normal.add(Vector(triangle.normal))
             }
 
             return normal.v
