@@ -34,11 +34,29 @@ cd RenderCraft
 java -jar RenderCraft.jar
 ```
 
+
 <div align="center">
 
 ![rendercraft](https://github.com/LucasFranciscoCorreia/RenderCraft/blob/master/readme/rendercraftdemo.gif?raw=true)
 
 </div>
+
+<h1>Rendering Different Objects</h1>
+<p>If you ever desire to render another object that's not a chalice, you can edit the `triangulos.txt` with the data of the object you like, as long as it's using the following template in a text file:</p>
+
+```css
+<number of points> <number of triangles>
+<point1X> <point1Y> <point1z>
+<point2X> <point2Y> <point2z>
+<point3X> <point1Y> <point3z>
+...
+<pointNX> <pointNY> <pointNz>
+<triangle1Point1> <triangle1Point2> <triangle1Point3>
+<triangle2Point1> <triangle2Point2> <triangle2Point3>
+<triangle3Point1> <triangle3Point2> <triangle3Point3>
+...
+<triangleMPoint1> <triangleMPoint2> <triangleMPoint3>
+```
 
 <h2>🛡️ License:</h2>
 
