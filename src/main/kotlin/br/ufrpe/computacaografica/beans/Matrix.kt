@@ -25,29 +25,72 @@ import br.ufrpe.computacaografica.exceptions.InvalidMatrixMultiplicationExceptio
 
 class Matrix {
     /**
+     * Sets the value of the matrix at the specified index and recalculates the transpose.
+     *
+     * @receiver The 2D array representing the matrix.
+     * @param i The index at which the value should be set.
+     * @param value The new value to be set at the specified index, wrapped in an IndexedValue.
+     */
+    private operator fun Array<Array<Double>>.set(i: Int, value: IndexedValue<Array<Double>>) {
+        this[i] = value.value
+        calculateTranspose()
+    }
+
+    /**
+     * Sets the value at the specified position in the 2D array and recalculates the transpose of the matrix.
+     *
+     * @receiver The 2D array of Double values.
+     * @param i The row index where the value will be set.
+     * @param j The column index where the value will be set.
+     * @param value The new value to be set at the specified position.
+     */
+    private operator fun Array<Array<Double>>.set(i: Int, j: Int, value: Double) {
+        this[i][j] = value
+        calculateTranspose()
+    }
+
+    /**
+     * Multiplies two arrays element-wise and returns the sum of the products.
+     *
+     * @param other The array to be multiplied with the current array.
+     * @return The sum of the element-wise products of the two arrays.
+     * @throws IllegalArgumentException If the arrays do not have the same length.
+     */
+    private operator fun Array<Double>.times(other: Array<Double>): Double {
+        if (this.size != other.size) {
+            throw IllegalArgumentException("Arrays must have the same length")
+        }
+        return (Array(this.size) { this[it] * other[it] }).sum()
+    }
+
+    /**
      * A 2D array representing a matrix of Double values.
      */
     var matrix: Array<Array<Double>>
+
     /**
-     * A property that returns the transpose of the matrix.
+     * A property representing the transpose of a matrix.
      * 
-     * The transpose of a matrix is obtained by swapping rows with columns.
-     * This property is computed dynamically each time it is accessed.
-     * 
-     * @property transpose The transposed matrix as a 2D array of Doubles.
+     * This property is an array of arrays of doubles, initialized to an empty 2D array.
+     * The getter returns the current value of the transpose.
+     * The setter is private, meaning it can only be modified within the class.
      */
     var transpose: Array<Array<Double>> = arrayOf(Array(0) { 0.0 })
-        get() {
-            field = Array(matrix[0].size) { Array(matrix.size) { 0.0 } }
-            for (i in matrix.indices) {
-                for (j in matrix[i].indices) {
-                    field[j][i] = matrix[i][j]
-                }
-            }
-            return field
-        }
+        get() = field
         private set
 
+
+    /**
+     * Calculates the transpose of the current matrix and assigns it to the `transpose` property.
+     * The transpose of a matrix is obtained by swapping its rows with its columns.
+     */
+    private fun calculateTranspose() {
+        this.transpose = Array(matrix[0].size) { j ->
+            Array(matrix.size) { i ->
+                matrix[i][j]
+            }
+        }
+    }
     /**
      * Constructs a Matrix object with the given 2D array of Doubles.
      *
@@ -55,6 +98,7 @@ class Matrix {
      */
     constructor(m: Array<Array<Double>>) {
         this.matrix = m
+        calculateTranspose()
     }
 
     /**
@@ -64,6 +108,7 @@ class Matrix {
      */
     constructor(m: Array<Double>) {
         this.matrix = Array(1) { m }
+        calculateTranspose()
     }
 
     /**
@@ -84,38 +129,20 @@ class Matrix {
         get() = matrix.size
 
     /**
-     * Multiplies a row vector by a column vector and returns the resulting scalar value.
-     *
-     * This function supports both 2D and 3D vectors. If the vectors have a size of 2, it calculates
-     * the dot product for 2D vectors. Otherwise, it calculates the dot product for 3D vectors.
-     *
-     * @param row The row vector represented as an array of Doubles.
-     * @param column The column vector represented as an array of Doubles.
-     * @return The resulting scalar value from the dot product of the row and column vectors.
-     */
-    private fun multiplyRowColumn(row: Array<Double>, column: Array<Double>): Double = 
-        (arrayOf(row[0]*column[0]+row[1]*column[1]).sum()
-        .takeIf { row.size == 2 }) ?: arrayOf(row[0]*column[0]+row[1]*column[1]+row[2]*column[2]).sum()
-
-    /**
      * Multiplies the current matrix with another matrix.
      *
-     * @param m The matrix to be multiplied with the current matrix.
+     * @param m2 The matrix to be multiplied with the current matrix.
      * @return A new matrix which is the result of the multiplication.
      * @throws InvalidMatrixMultiplicationException If the number of columns in the current matrix
      *         does not match the number of rows in the matrix to be multiplied.
      */
-    fun multiply(m: Matrix): Matrix {
-        if (this.columns != m.row) throw InvalidMatrixMultiplicationException(this.row, m.columns)
-        val res = Array(this.row) {Array(m.columns) {0.0}}
-
-        for (i in 0 until this.row) {
-            for (j in 0 until m.columns) {
-                res[i][j] = this.multiplyRowColumn(this.matrix[i], m.transpose[j])
+    operator fun times(m2: Matrix): Matrix {
+        if (this.columns != m2.row) throw InvalidMatrixMultiplicationException(this.row, m2.columns)
+        return Matrix(Array(this.row) {i ->
+            Array(m2.columns) {j ->
+                this.matrix[i] * m2.transpose[j]
             }
-        }
-
-        return Matrix(res)
+        });
     }
     
     companion object {

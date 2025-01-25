@@ -768,13 +768,11 @@ class Window : Initializable {
     private fun orthogonizeV() {
         val ortho = V.scalarMultiplication(N) / N.scalarMultiplication(N)
         val n = N.v
-        val vaux = arrayOf(ortho * n[0], ortho * n[1], ortho * n[2])
-        V.v[0] -= vaux[0]
-        V.v[1] -= vaux[1]
-        V.v[2] -= vaux[2]
+        val vaux = Vector(arrayOf(ortho * n[0], ortho * n[1], ortho * n[2]))
+        V -= vaux
         this.N = N.normalizeVector()
         this.V = V.normalizeVector()
-        this.U = N.crossProduct(V)
+        this.U = N*V
     }
 
     /**
@@ -820,7 +818,7 @@ class Window : Initializable {
      *
      * @param triangle The Triangle to be processed.
      */
-    private  fun scanLine(triangle: Triangle) {
+    private fun scanLine(triangle: Triangle) {
         var ymin: Double = triangle.screen[0].points[1].coerceAtMost(triangle.screen[1].points[1])
         ymin = ymin.coerceAtMost(triangle.screen[2].points[1])
         lateinit var start: Point
@@ -1007,37 +1005,37 @@ class Window : Initializable {
         val q: Array<Double> = Point.barycentricCoordinate(t.screen[0], t.screen[1], t.screen[2], Point(arrayOf(x, y)))
         val p: Point = Point.calculatePointBarycentricCoordinate(t.points[0], t.points[1], t.points[2], q[0], q[1], 1.0 - q[0] - q[1])
         val origem = Point(arrayOf(0.0, 0.0, 0.0))
-        val n1 = Vector(t.points[0].normal).multiplyByScalar(q[0])
-        val n2 = Vector(t.points[1].normal).multiplyByScalar(q[1])
-        val n3 = Vector(t.points[2].normal).multiplyByScalar(1.0 - q[0] - q[1])
-        p.normal = n1.add(n2).add(n3).normalizeVector().v
-        val N = Vector(p.normal)
-        val V = Vector(origem.subtract(p).normalizeVector().v)
-        val L = Vector(PlValue.subtract(Vector(p.points)).normalizeVector().v)
+        val n1 = Vector(t.points[0].normal)*q[0]
+        val n2 = Vector(t.points[1].normal)*q[1]
+        val n3 = Vector(t.points[2].normal)*(1.0 - q[0] - q[1])
+        p.normal = (n1+n2+n3).normalizeVector().v
+        var N = Vector(p.normal)
+        val V = Vector((origem - p).normalizeVector().v)
+        val L = Vector((PlValue - Vector(p.points)).normalizeVector().v)
         val R = Vector(calculateR(N, L).normalizeVector().v)
         lateinit var Id: Array<Double>
         lateinit var Is: Array<Double>
-        val Ia = Vector(IambValue.v).multiplyByScalar(this.KaValue)
+        val Ia = Vector(IambValue.v)*this.KaValue
 
         if (N.scalarMultiplication(L) < 0.0) {
             if (N.scalarMultiplication(V) < 0.0) {
-                N.v = arrayOf(-N.v[0], -N.v[1],-N.v[2])
-                Is = IlValue.multiplyByScalar(this.KsValue * (R).scalarMultiplication(V).pow(this.etaValue)).v
-                Id = KdValue.elementWiseMultiplication(IlValue.elementWiseMultiplication(OdValue.multiplyByScalar(N.scalarMultiplication(L)))).v
+                N = -N
+                Is = (IlValue*(this.KsValue * (R).scalarMultiplication(V).pow(this.etaValue))).v
+                Id = KdValue.elementWiseMultiplication(IlValue.elementWiseMultiplication(OdValue*N.scalarMultiplication(L))).v
             } else {
                 Is = origem.points
                 Id = origem.points
             }
         }else{
-            Is = IlValue.multiplyByScalar(this.KsValue * (R).scalarMultiplication(V).pow(this.etaValue)).v
-            Id = KdValue.elementWiseMultiplication(IlValue.elementWiseMultiplication(OdValue.multiplyByScalar(N.scalarMultiplication(L)))).v
+            Is = (IlValue*(this.KsValue * (R).scalarMultiplication(V).pow(this.etaValue))).v
+            Id = KdValue.elementWiseMultiplication(IlValue.elementWiseMultiplication(OdValue*N.scalarMultiplication(L))).v
         }
 
         if (R.scalarMultiplication(V) < 0.0) {
             Is = origem.points
         }
 
-        val I = Ia.add(Vector(Id)).add(Vector(Is))
+        val I = Ia+Vector(Id)+Vector(Is)
 
         I.v = arrayOf(
             min(max(I.v[0], 0.0), 255.0),
@@ -1075,7 +1073,7 @@ class Window : Initializable {
      * @param L The light vector.
      * @return The reflection vector R.
      */
-    private fun calculateR(N: Vector, L: Vector): Vector = Vector(N.multiplyByScalar(2.0 * N.scalarMultiplication(L)).v.mapIndexed { i, value -> value - L.v[i] }.toTypedArray())
+    private fun calculateR(N: Vector, L: Vector): Vector = Vector((N*(2.0 * N.scalarMultiplication(L))).v.mapIndexed { i, value -> value - L.v[i] }.toTypedArray())
 
     /**
      * Projects a 3D point onto the 2D screen.
@@ -1141,7 +1139,7 @@ class Window : Initializable {
         triangle.points[0].let { p1 ->
             triangle.points[1].let { p2 ->
                 triangle.points[2].let { p3 ->
-                    p2.subtract(p1).crossProduct(p3.subtract(p1)).normalizeVector().v
+                    ((p2 - p1)*(p3 - p1)).normalizeVector().v
                 }
             }
         }
@@ -1175,9 +1173,9 @@ class Window : Initializable {
      */
     private fun screenCord(p: Point): Point =
         Matrix(this.orthogonalBasis()).let { ortonormal ->
-            Matrix(p.subtract(this.C).v).let { subtract ->
+            Matrix((p- this.C).v).let { subtract ->
                 Matrix(subtract.transpose).let { transpose ->
-                    Point(ortonormal.multiply(transpose).transpose[0])
+                    Point((ortonormal*transpose).transpose[0])
                 }
             }
         }
@@ -1260,7 +1258,7 @@ class Window : Initializable {
             var normal = Vector(arrayOf(0.0, 0.0, 0.0))
 
             for (triangle in point.triangles) {
-                normal = normal.add(Vector(triangle.normal))
+                normal += Vector(triangle.normal)
             }
 
             return normal.v

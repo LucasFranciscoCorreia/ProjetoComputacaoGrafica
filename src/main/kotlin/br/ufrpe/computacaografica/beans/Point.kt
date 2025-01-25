@@ -57,7 +57,7 @@ class Point {
      * @return A new vector representing the difference between the two points.
      * @throws DifferentVectorSizeException if the points have different sizes.
      */
-    fun subtract(p2: Point): Vector = Array(points.size) { i-> points[i]-p2.points[i]}.let { Vector(it) }.takeIf { points.size == p2.points.size } ?: throw DifferentVectorSizeException(this.points.size, p2.points.size)
+    operator fun minus(p2: Point): Vector = Array(points.size) { i-> points[i]-p2.points[i]}.let { Vector(it) }.takeIf { points.size == p2.points.size } ?: throw DifferentVectorSizeException(this.points.size, p2.points.size)
 
     /**
      * Checks if this Point is equal to another object.
@@ -71,6 +71,7 @@ class Point {
 
         return this.points.contentEquals(other.points)
     }
+
 
     companion object {
         /**
@@ -93,7 +94,7 @@ class Point {
             val determinant = a * d - b * c
 
             val inverse: Array<Array<Double>> = Matrix.inverse(m1.matrix, determinant)
-            val mult: Matrix = (Matrix(inverse)).multiply(m2)
+            val mult: Matrix = Matrix(inverse)*m2
             return mult.transpose[0]
         }
 

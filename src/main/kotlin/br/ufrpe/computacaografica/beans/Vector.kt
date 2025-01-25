@@ -19,12 +19,7 @@ class Vector(var v: Array<Double>) {
      * @param mult The scalar value to multiply the vector by.
      * @return A new vector that is the result of the multiplication.
      */
-    fun multiplyByScalar(mult: Double): Vector = Vector(arrayOf(mult * v[0], mult * v[1], mult * v[2]))
-
-    /**
-     * The norm of the vector, calculated as the square root of the sum of the squares of its components.
-     */
-    private val norm: Double = sqrt(arrayOf(v[0] * v[0], v[1] * v[1], v[2] * v[2]).sum())
+    operator fun times(mult: Double): Vector = Vector(arrayOf(mult * v[0], mult * v[1], mult * v[2]))
 
     /**
      * Computes the cross product of this vector with another vector.
@@ -33,7 +28,7 @@ class Vector(var v: Array<Double>) {
      * @return A new vector that is the cross product of this vector and the given vector.
      * @throws DifferentVectorSizeException if the vectors have different sizes.
      */
-    fun crossProduct(v2: Vector): Vector {
+    operator fun times (v2: Vector): Vector {
         if(v.size != v2.v.size) throw DifferentVectorSizeException(v.size, v2.v.size)
 
         val m = Array(3) { Array(3){0.0} }
@@ -52,6 +47,12 @@ class Vector(var v: Array<Double>) {
     }
 
     /**
+     * The norm of the vector, calculated as the square root of the sum of the squares of its components.
+     */
+    private val norm: Double = sqrt(arrayOf(v[0] * v[0], v[1] * v[1], v[2] * v[2]).sum())
+
+
+    /**
      * Normalizes the vector.
      *
      * This function calculates the normalized version of the vector by dividing each component
@@ -67,8 +68,7 @@ class Vector(var v: Array<Double>) {
      * @param v2 The vector to be added.
      * @return A new vector that is the result of the addition.
      */
-    fun add(v2: Vector): Vector = Vector(arrayOf(v[0]+v2.v[0], v[1]+v2.v[1], v[2]+v2.v[2]))
-
+    operator fun plus(v2: Vector): Vector = Vector(arrayOf(v[0]+v2.v[0], v[1]+v2.v[1], v[2]+v2.v[2]))
     /**
      * Performs element-wise multiplication of this vector with another vector.
      *
@@ -83,5 +83,15 @@ class Vector(var v: Array<Double>) {
      * @param v2 The vector to subtract from this vector.
      * @return A new vector that is the result of the subtraction.
      */
-    fun subtract(v2: Vector): Vector = Vector(arrayOf(v[0]-v2.v[0], v[1]-v2.v[1], v[2]-v2.v[2]))
+    operator fun minus(v2: Vector): Vector = Vector(arrayOf(v[0]-v2.v[0], v[1]-v2.v[1], v[2]-v2.v[2]))
+
+    /**
+     * Returns a new Vector instance with all components negated.
+     *
+     * This operator function allows the use of the unary minus operator (-) on a Vector instance.
+     * For example, if `v` is a Vector, `-v` will return a new Vector with each component negated.
+     *
+     * @return A new Vector with each component negated.
+     */
+    operator fun unaryMinus(): Vector = Vector(arrayOf(-v[0], -v[1], -v[2]))
 }
