@@ -5,9 +5,6 @@
 <p id="description">This project is a graphical application that visualizes a 3D object in a frame of 800x800. This project is designed as a project for Basic Computer Graphics at UFRPE offered in 2018.1</p>
 <H1 id="warning">WARNING</H1>
 <p>Despite my efforts, this project is not optimal, nor does it use a graphics card to render the 3D object. It uses a single thread to render it. The existence of this project is for academic purposes, as much as it was for me as a project for Basic Computer Graphics if anyone ever desires to know how the rendering process works.</p>
-<h2>📋 Project Overview:</h2>
-
-<p>This project is a graphical application that visualizes a 3D object.</p>
 
 <p align="center"><img src="https://img.shields.io/github/downloads/LucasFranciscoCorreia/RenderCraft/total" alt="shields"><img src="https://img.shields.io/github/issues/LucasFranciscoCorreia/RenderCraft" alt="shields"><img src="https://img.shields.io/github/issues-pr/LucasFranciscoCorreia/RenderCraft" alt="shields"><img src="https://img.shields.io/github/license/LucasFranciscoCorreia/RenderCraft" alt="shields"><img src="https://img.shields.io/github/repo-size/LucasFranciscoCorreia/RenderCraft" alt="shields"></p>
 
